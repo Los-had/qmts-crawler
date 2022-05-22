@@ -6,12 +6,10 @@ import (
 	"net/url"
 	"strings"
 	"github.com/gocolly/colly"
-	//"github.com/gocolly/colly/proxy"
 )
 
-var proxyList []string = []string{"http://192.155.107.214:1080", "http://213.230.97.10:3128", "http://170.239.255.2:55443"}
 var results []Result
-var userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36"
+var userAgent = "QMTSbot/0.0.1"
 
 type Seed struct {
     Host   string `json:"host"`
@@ -26,9 +24,9 @@ type Result struct {
     Title       string    `json:"title"`
     Description string    `json:"description"`
     Keywords    []string  `json:"keywords"`
-    Info        *Seed     `json:"info"`
     Visited     bool      `json:"visited"`
     VisitedTime time.Time `json:"time"`
+    //Info      *Seed     `json:"info"`
 }
 
 // Check if is a valid URL
@@ -37,7 +35,8 @@ func CheckURL(rawURL string) bool {
     if err != nil {
         return false
     }
-    if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+    
+    if parsedURL.Scheme != "http" && parsedURL.Scheme != "https"  {
         return false
     }
 
@@ -58,6 +57,21 @@ func GetSeedInfo(seed string) Seed {
     }
 }
 
+// Parse the Result struct
+func ParseResult(r Result) Result {
+    if r.Favicon == "" {
+        r.Favicon = ""
+    } else if r.Keywords == nil {
+        r.Keywords = []string{r.URL, r.Title}
+    } else if r.Description == "" {
+        r.Description = fmt.Sprintf("Description not provided, %v", r.VisitedTime)
+    } else if r.Title == "" {
+        r.Title = r.URL
+    }
+
+    return r
+}
+
 // Get data(favicon, title, description and etc) from a website
 func Scrape(url string) Result {
     if !CheckURL(url) {
@@ -71,17 +85,9 @@ func Scrape(url string) Result {
         colly.UserAgent(userAgent),
         colly.Async(true),
     )
-
-    /*
-    if py, err := proxy.RoundRobinProxySwitcher(proxyList...); err != nil {
-        fmt.Println("Error occurred:", err)
-    } else {
-        c.SetProxyFunc(py)
-    }
-    */
     
     c.OnHTML("title", func (e *colly.HTMLElement) {
-        result.Title = e.Text
+        result.Title = strings.TrimSpace(e.Text)
     })
 
     c.OnHTML("meta[name=keywords]", func (e *colly.HTMLElement) {
@@ -89,7 +95,7 @@ func Scrape(url string) Result {
     })
     
     c.OnHTML("meta[name=description]", func (e *colly.HTMLElement) {
-        result.Description = e.Attr("content")
+        result.Description = strings.TrimSpace(e.Attr("content"))
     })
 
     c.OnHTML("link[rel=\"shortcut icon\"]", func (e *colly.HTMLElement) {
@@ -117,12 +123,8 @@ func Scrape(url string) Result {
             return
         }
         contentType := resp.Headers.Get("Content-Type")
-        switch contentType {
-        case "text/html; charset=utf-8":
-        case "text/html; charset=UFT-8":
-        case "text/html":
-        default:
-            fmt.Println("Invalid content-type, content-type:", resp.Headers.Get("Content-Type"))
+        if !strings.Contains(contentType, "text/html") {
+            fmt.Println("Invalid content-type, Content-Type:", contentType)
             return
         }
     })
@@ -135,7 +137,7 @@ func Scrape(url string) Result {
     c.Visit(url)
     c.Wait()
 
-    return result
+    return ParseResult(result)
 }
 
 // Get all the links in the webpage
@@ -145,17 +147,21 @@ func Crawl(seedlist string) []string {
         colly.UserAgent(userAgent),
         colly.Async(true),
     )
+    
     crawler.OnHTML("a", func (e *colly.HTMLElement) {
         C_URL := e.Attr("href")
-        if !strings.HasPrefix(C_URL, "/") {
-            _, err := url.ParseRequestURI(C_URL)
-            if err == nil {
+        _, err := url.ParseRequestURI(C_URL)
+        if err == nil {
+            if !strings.HasPrefix(C_URL, "/") {
                 urls = append(urls, C_URL)
-            }   
-        } else {
-            C_URL = e.Request.AbsoluteURL(e.Attr("href"))
-            if C_URL != "" {
+            } else if strings.HasPrefix(C_URL, "//") {
+                C_URL = "http:" + C_URL
                 urls = append(urls, C_URL)
+            } else {
+                C_URL = e.Request.AbsoluteURL(e.Attr("href"))
+                if C_URL != "" {
+                    urls = append(urls, C_URL)
+                }
             }
         }
     })
