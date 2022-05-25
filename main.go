@@ -7,7 +7,9 @@ import (
 
 
 func main() {
+    var count int64
     var seed string
+    //var queue []crawler.Result
     fmt.Println("--- QMTS crawler ---")
     fmt.Scanln(&seed)
     seedinfo := crawler.GetSeedInfo(seed)
@@ -23,5 +25,8 @@ func main() {
     r := crawler.Crawl(seed)
     for _, i := range r {
         fmt.Println(crawler.Scrape(i))
+        count++
     }
+    fmt.Printf("%v results found!\n", count)
 }
+ 

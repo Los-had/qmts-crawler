@@ -2,14 +2,14 @@ package crawler
 
 import (
 	"fmt"
-    "time"
 	"net/url"
 	"strings"
+	"time"
 	"github.com/gocolly/colly"
 )
 
 var results []Result
-var userAgent = "QMTSbot/0.0.1"
+var userAgent = "QMTSbot/0.1.1"
 
 type Seed struct {
     Host   string `json:"host"`
@@ -25,8 +25,7 @@ type Result struct {
     Description string    `json:"description"`
     Keywords    []string  `json:"keywords"`
     Visited     bool      `json:"visited"`
-    VisitedTime time.Time `json:"time"`
-    //Info      *Seed     `json:"info"`
+    VisitedTime string    `json:"time"`
 }
 
 // Check if is a valid URL
@@ -110,7 +109,7 @@ func Scrape(url string) Result {
 
     c.OnScraped(func (r *colly.Response) {
         result.Visited = true
-        result.VisitedTime = time.Now()
+        result.VisitedTime = time.Now().String()
     })
 
     c.OnRequest(func (r *colly.Request) {

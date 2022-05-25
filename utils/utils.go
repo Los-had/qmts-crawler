@@ -11,3 +11,4 @@ var proxyList []string = []string{"http://192.155.107.214:1080", "http://213.230
         c.SetProxyFunc(py)
     }
 */
+//Info      *Seed     `json:"info"`
