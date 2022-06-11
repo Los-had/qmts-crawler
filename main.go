@@ -8,7 +8,6 @@ import (
 
 
 func main() {
-    //var count int64
     var seed string
 
     flag.StringVar(&seed, "seed", "", "Crawler seed list")
@@ -17,9 +16,5 @@ func main() {
     fmt.Println("Crawling", seed)
 
     crawler.StartCrawling(seed)
-    /*
-    fmt.Println("--- RESULTS ---")
-    fmt.Printf("%v results found!\n", count)
-    */
 }
  
