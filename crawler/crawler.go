@@ -1,7 +1,9 @@
 package crawler
 
 import (
-	"fmt"
+	"log"
+    "log/syslog"
+    "fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -75,11 +77,17 @@ func ParseResult(r Result) Result {
 // Get data(favicon, title, description and etc) from a website
 func Scrape(url string) Result {
     if !CheckURL(url) {
-        fmt.Println("Invalid URL")
+        log.Println("Invalid URL")
         return Result{}
     }
+    
     var result Result
     result.URL = url
+    logFile, err := syslog.New(syslog.LOG_SYSLOG, "QMTS Crawler")
+    if err != nil {
+        log.Fatalln("Unable to set logfile:", err.Error())
+    }
+    log.SetOutput(logFile) // set the log output
     c := colly.NewCollector(
         colly.IgnoreRobotsTxt(),
         colly.UserAgent(userAgent),
@@ -114,23 +122,23 @@ func Scrape(url string) Result {
     })
 
     c.OnRequest(func (r *colly.Request) {
-        fmt.Println("[GET] ->", r.URL)
+        log.Println("[GET] ->", r.URL)
     })
 
     c.OnResponse(func (resp *colly.Response) {
         if resp.StatusCode != 200 {
-            fmt.Println("Request error, status code:", resp.StatusCode)
+            log.Println("Request error, status code:", resp.StatusCode)
             return
         }
         contentType := resp.Headers.Get("Content-Type")
         if !strings.Contains(contentType, "text/html") {
-            fmt.Println("Invalid content-type, Content-Type:", contentType)
+            log.Println("Invalid content-type, Content-Type:", contentType)
             return
         }
     })
 
     c.OnError(func (r *colly.Response, err error) {
-        fmt.Println("Request failed:", url, "\nError:", err)
+        log.Println("Request failed:", url, "\nError:", err)
         return
     })
 
