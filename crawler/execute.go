@@ -5,6 +5,8 @@ import "fmt"
 var visited map[string]bool = map[string]bool{} // map with the visited links
 var crawled []Result
 
+// TODO: improve this shit
+
 // Executes the crawler
 func StartCrawling(seed string) {
     var queue []string
