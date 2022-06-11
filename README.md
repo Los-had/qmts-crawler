@@ -1,6 +1,6 @@
 # QMTS-Crawler
 
-Implementing my own webcrawler in golang
+Implementing my own web crawler in golang
 
 # Installing and running the crawler
 
