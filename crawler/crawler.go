@@ -24,6 +24,7 @@ type Result struct {
     Title       string    `json:"title"`
     Description string    `json:"description"`
     Keywords    []string  `json:"keywords"`
+    Images      []Image   `json:"images"`
     Visited     bool      `json:"visited"`
     VisitedTime string    `json:"time"`
 }
@@ -132,6 +133,8 @@ func Scrape(url string) Result {
         fmt.Println("Request failed:", url, "\nError:", err)
         return
     })
+
+    result.Images = FindAllImages(url)
     
     c.Visit(url)
     c.Wait()

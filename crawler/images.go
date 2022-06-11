@@ -11,6 +11,7 @@ type Image struct {
     Host string `json:"host"`
 }
 
+// Find all the images in a web page
 func FindAllImages(seed string) []Image {
     crawler := colly.NewCollector(
         colly.Async(true),
@@ -22,7 +23,7 @@ func FindAllImages(seed string) []Image {
         alt := e.Attr("alt")
         host, err := url.Parse(e.Attr("src"))
         if err != nil {
-            host.Scheme = "Cannot find the image host."
+            host.Host = "Cannot find the image host."
         }
 
         if alt == "" {
@@ -32,7 +33,7 @@ func FindAllImages(seed string) []Image {
         imgs = append(imgs, Image{
             URL: e.Attr("src"),
             Alt: alt,
-            Host: host.Scheme,
+            Host: host.Host,
         })
     })
 

@@ -12,3 +12,17 @@ var proxyList []string = []string{"http://192.155.107.214:1080", "http://213.230
     }
 */
 //Info      *Seed     `json:"info"`
+
+
+//var queue []crawler.Result
+/*
+    seedinfo := crawler.GetSeedInfo(seed)
+    fmt.Println("--- SEED INFO ---")
+    fmt.Printf(
+        "Host: %v \nScheme: %v \nPort: %v \nParams: %v \n",
+        seedinfo.Host,
+        seedinfo.Scheme,
+        seedinfo.Port,
+        seedinfo.Params,
+    )
+*/
