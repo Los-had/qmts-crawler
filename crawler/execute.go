@@ -1,9 +1,14 @@
 package crawler
 
-import "fmt"
+import (
+    "fmt"
+    "github.com/Los-had/qmts-crawler/utils"
+)
 
 var visited map[string]bool = map[string]bool{} // map with the visited links
-var crawled []Result
+var crawled []utils.Result
+
+// TODO: improve this shit
 
 // Executes the crawler
 func StartCrawling(seed string) {

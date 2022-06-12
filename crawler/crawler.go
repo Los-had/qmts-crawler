@@ -1,88 +1,36 @@
 package crawler
 
 import (
-	"fmt"
+	"log"
+    //"log/syslog"
 	"net/url"
+    "github.com/Los-had/qmts-crawler/utils"
 	"strings"
 	"time"
 	"github.com/gocolly/colly"
 )
 
-var results []Result
-var userAgent = "QMTSbot/0.1.1"
-
-type Seed struct {
-    Host   string `json:"host"`
-    Scheme string `json:"scheme"`
-    Params string `json:"params"`
-    Port   string `json:"port"`
-}
-
-type Result struct {
-    Favicon     string    `json:"favicon"`
-    URL         string    `json:"url"`
-    Title       string    `json:"title"`
-    Description string    `json:"description"`
-    Keywords    []string  `json:"keywords"`
-    Images      []Image   `json:"images"`
-    Visited     bool      `json:"visited"`
-    VisitedTime string    `json:"time"`
-}
-
-// Check if is a valid URL
-func CheckURL(rawURL string) bool {
-    parsedURL, err := url.Parse(rawURL) 
-    if err != nil {
-        return false
-    }
-    
-    if parsedURL.Scheme != "http" && parsedURL.Scheme != "https"  {
-        return false
-    }
-
-    return true
-}
-
-// Get information of an especific domain
-func GetSeedInfo(seed string) Seed {
-    si, err := url.Parse(seed)
-    if err != nil {
-        panic(err)
-    }
-    return Seed{
-        Host: si.Hostname(),
-        Scheme: si.Scheme,
-        Port: si.Port(),
-        Params: si.RawQuery,
-    }
-}
-
-// Parse the Result struct
-func ParseResult(r Result) Result {
-    if r.Favicon == "" {
-        r.Favicon = ""
-    } else if r.Keywords == nil {
-        r.Keywords = []string{r.URL, r.Title}
-    } else if r.Description == "" {
-        r.Description = fmt.Sprintf("Description not provided, %v", r.VisitedTime)
-    } else if r.Title == "" {
-        r.Title = r.URL
-    }
-
-    return r
-}
+var results []utils.Result
 
 // Get data(favicon, title, description and etc) from a website
-func Scrape(url string) Result {
-    if !CheckURL(url) {
-        fmt.Println("Invalid URL")
-        return Result{}
+func Scrape(url string) utils.Result {
+    if !utils.CheckURL(url) {
+        log.Println("Invalid URL")
+        return utils.Result{}
     }
-    var result Result
+    
+    var result utils.Result
     result.URL = url
+    /*
+    logFile, err := syslog.New(syslog.LOG_SYSLOG, "QMTS Crawler")
+    if err != nil {
+        log.Fatalln("Unable to set logfile:", err.Error())
+    }
+    log.SetOutput(logFile) // set the log output
+    */
     c := colly.NewCollector(
         colly.IgnoreRobotsTxt(),
-        colly.UserAgent(userAgent),
+        colly.UserAgent(utils.UserAgent),
         colly.Async(true),
     )
     
@@ -109,28 +57,32 @@ func Scrape(url string) Result {
     })
 
     c.OnScraped(func (r *colly.Response) {
+        result.SitePages.AboutPage = utils.GetAboutPage(url)
+        result.SitePages.ContactsPage = utils.GetContactsPage(url)
+        result.SitePages.FAQPage = utils.GetFAQtPage(url)
+        result.SitePages.DownloadPage = utils.GetDownloadPage(url)
         result.Visited = true
         result.VisitedTime = time.Now().String()
     })
 
     c.OnRequest(func (r *colly.Request) {
-        fmt.Println("[GET] ->", r.URL)
+        log.Println("[GET] ->", r.URL)
     })
 
     c.OnResponse(func (resp *colly.Response) {
         if resp.StatusCode != 200 {
-            fmt.Println("Request error, status code:", resp.StatusCode)
+            log.Println("Request error, status code:", resp.StatusCode)
             return
         }
         contentType := resp.Headers.Get("Content-Type")
         if !strings.Contains(contentType, "text/html") {
-            fmt.Println("Invalid content-type, Content-Type:", contentType)
+            log.Println("Invalid content-type, Content-Type:", contentType)
             return
         }
     })
 
     c.OnError(func (r *colly.Response, err error) {
-        fmt.Println("Request failed:", url, "\nError:", err)
+        log.Println("Request failed:", url, "\nError:", err)
         return
     })
 
@@ -139,14 +91,14 @@ func Scrape(url string) Result {
     c.Visit(url)
     c.Wait()
 
-    return ParseResult(result)
+    return utils.ParseResult(result)
 }
 
 // Get all the links in the webpage
 func Crawl(seedlist string) []string {
     var urls []string
     crawler := colly.NewCollector(
-        colly.UserAgent(userAgent),
+        colly.UserAgent(utils.UserAgent),           
         colly.Async(true),
     )
     
