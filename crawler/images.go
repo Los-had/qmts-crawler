@@ -3,21 +3,16 @@ package crawler
 import (
     "net/url"
     "github.com/gocolly/colly"
+    "github.com/Los-had/qmts-crawler/utils"
 )
 
-type Image struct {
-    URL  string `json:"url"`
-    Alt  string `json:"alt"`
-    Host string `json:"host"`
-}
-
 // Find all the images in a web page
-func FindAllImages(seed string) []Image {
+func FindAllImages(seed string) []utils.Image {
     crawler := colly.NewCollector(
         colly.Async(true),
         colly.IgnoreRobotsTxt(),
     )
-    var imgs []Image
+    var imgs []utils.Image
 
     crawler.OnHTML("img", func (e *colly.HTMLElement) {
         alt := e.Attr("alt")
@@ -30,7 +25,7 @@ func FindAllImages(seed string) []Image {
             alt = "Description not provided"
         }
         
-        imgs = append(imgs, Image{
+        imgs = append(imgs, utils.Image{
             URL: e.Attr("src"),
             Alt: alt,
             Host: host.Host,
