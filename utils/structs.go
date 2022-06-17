@@ -16,6 +16,7 @@ type SiteData struct {
 type Result struct {
     Favicon     string    `json:"favicon"`
     URL         string    `json:"url"`
+    Lang        string    `json:"lang"`
     Title       string    `json:"title"`
     Description string    `json:"description"`
     Keywords    []string  `json:"keywords"`
