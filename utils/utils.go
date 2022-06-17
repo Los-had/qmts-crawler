@@ -4,6 +4,7 @@ import (
     "fmt"
     "strings"
     "net/url"
+    "crypto/sha256"
     "github.com/gocolly/colly"
 )
 
@@ -51,6 +52,7 @@ func ParseResult(r Result) Result {
     return r
 }
 
+// Generate urls
 func MakeURLS(url string) []string {
     var links []string
     if strings.HasSuffix(url ,"/") {
@@ -68,6 +70,7 @@ func MakeURLS(url string) []string {
     return links
 }
 
+// Get the about page
 func GetAboutPage(site string) PageData {
     var res PageData
     toBeCrawled := MakeURLS(site)
@@ -92,6 +95,7 @@ func GetAboutPage(site string) PageData {
     return res
 }
 
+// Get the contacts page
 func GetContactsPage(site string) PageData {
     var res PageData
     toBeCrawled := MakeURLS(site)
@@ -116,6 +120,7 @@ func GetContactsPage(site string) PageData {
     return res
 }
 
+// Get the FAQ page
 func GetFAQtPage(site string) PageData {
     var res PageData
     toBeCrawled := MakeURLS(site)
@@ -140,6 +145,7 @@ func GetFAQtPage(site string) PageData {
     return res
 }
 
+// Get the download page
 func GetDownloadPage(site string) PageData {
     var res PageData
     toBeCrawled := MakeURLS(site)
@@ -162,4 +168,10 @@ func GetDownloadPage(site string) PageData {
     c.Wait()
 
     return res
+}
+
+// Generate a unique hash by passing a url
+func CreateHash(link string) string {
+    hash := sha256.Sum256([]byte(link))
+	return string(hash[:])
 }

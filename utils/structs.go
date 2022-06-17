@@ -24,6 +24,7 @@ type Result struct {
     Images      []Image   `json:"images"`
     Visited     bool      `json:"visited"`
     VisitedTime string    `json:"time"`
+    Hash        string    `json:"hash"`
 }
 
 type Seed struct {
@@ -44,8 +45,3 @@ type Suggestion struct {
     From string `json:"from"`
 }
 
-/*
-type WikipediaSuggestion struct {
-    suggestions []string
-}
-*/

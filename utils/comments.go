@@ -11,6 +11,7 @@ package utils
 */
 //Info      *Seed     `json:"info"`
 
+    //"log/syslog"
 
 //var queue []crawler.Result
 /*
@@ -31,3 +32,19 @@ fmt.Printf("%v results found!\n", count)
 */
 
 //var count int64
+
+    /*
+    logFile, err := syslog.New(syslog.LOG_SYSLOG, "QMTS Crawler")
+    if err != nil {
+        log.Fatalln("Unable to set logfile:", err.Error())
+    }
+    log.SetOutput(logFile) // set the log output
+    */
+
+
+/*
+type WikipediaSuggestion struct {
+    suggestions []string
+}
+*/
+0

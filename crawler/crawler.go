@@ -2,7 +2,6 @@ package crawler
 
 import (
 	"log"
-    //"log/syslog"
 	"net/url"
     "github.com/Los-had/qmts-crawler/utils"
 	"strings"
@@ -21,13 +20,8 @@ func Scrape(link string) utils.Result {
     
     var result utils.Result
     result.URL = link
-    /*
-    logFile, err := syslog.New(syslog.LOG_SYSLOG, "QMTS Crawler")
-    if err != nil {
-        log.Fatalln("Unable to set logfile:", err.Error())
-    }
-    log.SetOutput(logFile) // set the log output
-    */
+    result.Hash = utils.CreateHash(link)
+
     c := colly.NewCollector(
         colly.IgnoreRobotsTxt(),
         colly.UserAgent(utils.UserAgent),
