@@ -31,7 +31,7 @@ func GetBraveSuggestions(query string) []string {
 
     var suggestionsRawArray [][]string
 
-    json.Unmarshal(data, suggestionsRawArray)
+    json.Unmarshal([]byte(data), &suggestionsRawArray)
 
     return suggestionsRawArray[0]
 }
@@ -41,6 +41,7 @@ func GetGoogleSuggestions(query string) []string {
     c := colly.NewCollector(
         colly.Async(true),
         colly.IgnoreRobotsTxt(),
+        colly.UserAgent(utils.UserAgent),
     )
     var suggestionsList []string
 
@@ -71,7 +72,7 @@ func GetWikipediaSuggestions(query string) []string {
 
     var suggestionsRawArray [][]string
 
-    json.Unmarshal(data, suggestionsRawArray)
+    json.Unmarshal([]byte(data), &suggestionsRawArray)
 
     return suggestionsRawArray[0]
 }
