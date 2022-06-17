@@ -13,14 +13,14 @@ import (
 var results []utils.Result
 
 // Get data(favicon, title, description and etc) from a website
-func Scrape(url string) utils.Result {
-    if !utils.CheckURL(url) {
+func Scrape(link string) utils.Result {
+    if !utils.CheckURL(link) {
         log.Println("Invalid URL")
         return utils.Result{}
     }
     
     var result utils.Result
-    result.URL = url
+    result.URL = link
     /*
     logFile, err := syslog.New(syslog.LOG_SYSLOG, "QMTS Crawler")
     if err != nil {
@@ -55,16 +55,19 @@ func Scrape(url string) utils.Result {
         if !strings.HasPrefix(favicon, "/") {
             result.Favicon = favicon
         } else {
-            favicon = url + e.Attr("href")
+            favicon = link + e.Attr("href")
             result.Favicon = favicon
         }
     })
 
     c.OnScraped(func (r *colly.Response) {
-        result.SitePages.AboutPage = utils.GetAboutPage(url)
-        result.SitePages.ContactsPage = utils.GetContactsPage(url)
-        result.SitePages.FAQPage = utils.GetFAQtPage(url)
-        result.SitePages.DownloadPage = utils.GetDownloadPage(url)
+        host, err := url.ParseRequestURI(link)
+        if err != nil {} else {
+            result.SitePages.AboutPage = utils.GetAboutPage(host.Host)
+            result.SitePages.ContactsPage = utils.GetContactsPage(host.Host)
+            result.SitePages.FAQPage = utils.GetFAQtPage(host.Host)
+            result.SitePages.DownloadPage = utils.GetDownloadPage(host.Host)
+        }
         result.Visited = true
         result.VisitedTime = time.Now().String()
     })
@@ -86,13 +89,13 @@ func Scrape(url string) utils.Result {
     })
 
     c.OnError(func (r *colly.Response, err error) {
-        log.Println("Request failed:", url, "\nError:", err)
+        log.Println("Request failed:", link, "\nError:", err)
         return
     })
 
-    result.Images = FindAllImages(url)
+    result.Images = FindAllImages(link)
     
-    c.Visit(url)
+    c.Visit(link)
     c.Wait()
 
     return utils.ParseResult(result)
