@@ -9,15 +9,24 @@ import (
 
 func main() {
     var seed string
+    var suggest string
 
     // <-seed=> command line argument
     flag.StringVar(&seed, "seed", "", "Crawler seed list")
+    flag.StringVar(&suggest, "autocomplete", "", "Auto complete your query")
     flag.Parse()
 
-    fmt.Println(engines.AutoComplete("i5"))
+    if suggest != "" {
+        fmt.Println(engines.AutoComplete(suggest))
 
-    fmt.Println("Crawling", seed)
+        return
+    } else if seed != "" {
+        fmt.Println("Crawling", seed)
+        crawler.StartCrawling(seed)
 
-    crawler.StartCrawling(seed)
+        return
+    } else {
+        fmt.Println("Invalid, no action specified.")
+    }
 }
  
