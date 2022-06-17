@@ -4,17 +4,29 @@ import (
     "flag"
 	"fmt"
 	"github.com/Los-had/qmts-crawler/crawler"
+    "github.com/Los-had/qmts-crawler/engines"
 )
 
 func main() {
     var seed string
+    var suggest string
 
     // <-seed=> command line argument
     flag.StringVar(&seed, "seed", "", "Crawler seed list")
+    flag.StringVar(&suggest, "autocomplete", "", "Auto complete your query")
     flag.Parse()
 
-    fmt.Println("Crawling", seed)
+    if suggest != "" {
+        fmt.Println(engines.AutoComplete(suggest))
 
-    crawler.StartCrawling(seed)
+        return
+    } else if seed != "" {
+        fmt.Println("Crawling", seed)
+        crawler.StartCrawling(seed)
+
+        return
+    } else {
+        fmt.Println("Invalid, no action specified.")
+    }
 }
  

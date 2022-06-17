@@ -38,6 +38,10 @@ func Scrape(url string) utils.Result {
         result.Title = strings.TrimSpace(e.Text)
     })
 
+    c.OnHTML("html", func (e *colly.HTMLElement) {
+        result.Lang = e.Attr("lang")
+    })
+
     c.OnHTML("meta[name=keywords]", func (e *colly.HTMLElement) {
         result.Keywords = strings.Split(e.Attr("content"), ", ")
     })
