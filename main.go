@@ -13,6 +13,7 @@ func main() {
 
     // <-seed=> command line argument
     flag.StringVar(&seed, "seed", "", "Crawler seed list")
+    // <-autocomplete=> command line argument
     flag.StringVar(&suggest, "autocomplete", "", "Auto complete your query")
     flag.Parse()
 
