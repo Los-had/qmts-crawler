@@ -2,6 +2,7 @@ package crawler
 
 import (
     "fmt"
+    "time"
     "github.com/Los-had/qmts-crawler/utils"
 )
 
@@ -14,20 +15,30 @@ var crawled []utils.Result
 func StartCrawling(seed string) {
     var queue []string
     startUrls := Crawl(seed)
+    
+    for _, i := range startUrls {
+        currentPage := Crawl(i)
+        for _, u := range currentPage {
+            queue = append(queue, u)
+        }
+    }
 
-    // copy the startUrls array to the queue
+    // copy the startUrls array to the queue]
+    /*
     for _, i := range startUrls {
         queue = append(queue, i)
     }
+    */
 
-    for _, url := range startUrls {
+    time.Sleep(time.Second * 30)
+
+    for _, url := range queue {
         if ok := visited[url]; ok {
             continue
         }
         
-         crawled = append(crawled, Scrape(url))
+        crawled = append(crawled, Scrape(url))
         visited[url] = true
-        //queue[idx]
     }
 
     fmt.Println("Crawled info:\n", crawled)
