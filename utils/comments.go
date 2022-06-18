@@ -47,4 +47,3 @@ type WikipediaSuggestion struct {
     suggestions []string
 }
 */
-0

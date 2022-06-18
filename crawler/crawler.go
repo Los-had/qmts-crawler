@@ -55,15 +55,21 @@ func Scrape(link string) utils.Result {
     })
 
     c.OnScraped(func (r *colly.Response) {
-        host, err := url.ParseRequestURI(link)
-        if err != nil {} else {
-            result.SitePages.AboutPage = utils.GetAboutPage(host.Host)
-            result.SitePages.ContactsPage = utils.GetContactsPage(host.Host)
-            result.SitePages.FAQPage = utils.GetFAQtPage(host.Host)
-            result.SitePages.DownloadPage = utils.GetDownloadPage(host.Host)
-        }
         result.Visited = true
         result.VisitedTime = time.Now().String()
+        host, err := url.ParseRequestURI(link)
+        if err == nil {
+            if host.Scheme + "://" + host.Host + "/" == link {
+                result.SitePages.AboutPage = utils.GetAboutPage(link)
+                result.SitePages.FAQPage = utils.GetFAQtPage(link)
+                result.SitePages.DownloadPage = utils.GetDownloadPage(link)
+                result.SitePages.ContactsPage = utils.GetContactsPage(link)
+            }
+
+            return
+        } else {
+            return
+        }
     })
 
     c.OnRequest(func (r *colly.Request) {

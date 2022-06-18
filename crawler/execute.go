@@ -36,6 +36,8 @@ func StartCrawling(seed string) {
         if ok := visited[url]; ok {
             continue
         }
+
+        time.Sleep(time.Second * 1)
         
         crawled = append(crawled, Scrape(url))
         visited[url] = true
