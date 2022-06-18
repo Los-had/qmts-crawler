@@ -2,7 +2,6 @@ package crawler
 
 import (
 	"log"
-    //"log/syslog"
 	"net/url"
     "github.com/Los-had/qmts-crawler/utils"
 	"strings"
@@ -21,13 +20,8 @@ func Scrape(link string) utils.Result {
     
     var result utils.Result
     result.URL = link
-    /*
-    logFile, err := syslog.New(syslog.LOG_SYSLOG, "QMTS Crawler")
-    if err != nil {
-        log.Fatalln("Unable to set logfile:", err.Error())
-    }
-    log.SetOutput(logFile) // set the log output
-    */
+    result.Hash = utils.CreateHash(link)
+
     c := colly.NewCollector(
         colly.IgnoreRobotsTxt(),
         colly.UserAgent(utils.UserAgent),
@@ -61,15 +55,21 @@ func Scrape(link string) utils.Result {
     })
 
     c.OnScraped(func (r *colly.Response) {
-        host, err := url.ParseRequestURI(link)
-        if err != nil {} else {
-            result.SitePages.AboutPage = utils.GetAboutPage(host.Host)
-            result.SitePages.ContactsPage = utils.GetContactsPage(host.Host)
-            result.SitePages.FAQPage = utils.GetFAQtPage(host.Host)
-            result.SitePages.DownloadPage = utils.GetDownloadPage(host.Host)
-        }
         result.Visited = true
         result.VisitedTime = time.Now().String()
+        host, err := url.ParseRequestURI(link)
+        if err == nil {
+            if host.Scheme + "://" + host.Host + "/" == link {
+                result.SitePages.AboutPage = utils.GetAboutPage(link)
+                result.SitePages.FAQPage = utils.GetFAQtPage(link)
+                result.SitePages.DownloadPage = utils.GetDownloadPage(link)
+                result.SitePages.ContactsPage = utils.GetContactsPage(link)
+            }
+
+            return
+        } else {
+            return
+        }
     })
 
     c.OnRequest(func (r *colly.Request) {
