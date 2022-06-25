@@ -45,3 +45,10 @@ type Suggestion struct {
     From string `json:"from"`
 }
 
+type StackOverFlowQuestion struct {
+    URL     string `json:"url"`
+    Title   string `json:"title"`
+    Summary string `json:"summary"`
+    Votes   string `json:"votes"`
+    Date    string `json:"date"`
+}
