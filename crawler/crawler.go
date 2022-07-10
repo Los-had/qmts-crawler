@@ -1,11 +1,12 @@
 package crawler
 
 import (
+    "os"
 	"log"
 	"net/url"
-    "github.com/Los-had/qmts-crawler/utils"
 	"strings"
 	"time"
+	"github.com/Los-had/qmts-crawler/utils"
 	"github.com/gocolly/colly"
 )
 
@@ -21,6 +22,9 @@ func Scrape(link string) utils.Result {
     var result utils.Result
     result.URL = link
     result.Hash = utils.CreateHash(link)
+    file, _ := os.Create("crawler.log")
+    log.SetOutput(file)
+    defer file.Close()
 
     c := colly.NewCollector(
         colly.IgnoreRobotsTxt(),
